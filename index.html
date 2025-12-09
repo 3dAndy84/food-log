@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -152,6 +153,20 @@
         .success-message.show {
             display: block;
         }
+
+        .error-message {
+            display: none;
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .error-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -163,7 +178,11 @@
             ✓ Entry logged successfully!
         </div>
 
-        <form id="foodLog" onsubmit="return false;">
+        <div class="error-message" id="errorMessage">
+            ✗ Failed to log entry. Please try again.
+        </div>
+
+        <form id="foodLog">
             <div class="form-group">
                 <label for="datetime">Date & Time</label>
                 <input type="datetime-local" id="datetime" name="datetime" required>
@@ -252,82 +271,114 @@
 
     <script>
         // Set current date and time as default
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById('datetime').value = now.toISOString().slice(0, 16);
+        (function() {
+            var now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('datetime').value = now.toISOString().slice(0, 16);
+        })();
 
         // Handle physical feeling selection
-        const physicalOptions = document.querySelectorAll('.physical-option');
-        const physicalFeelingInput = document.getElementById('physicalFeeling');
+        var physicalOptions = document.querySelectorAll('.physical-option');
+        var physicalFeelingInput = document.getElementById('physicalFeeling');
 
-        physicalOptions.forEach(option => {
+        physicalOptions.forEach(function(option) {
             option.addEventListener('click', function() {
-                physicalOptions.forEach(opt => opt.classList.remove('selected'));
+                physicalOptions.forEach(function(opt) {
+                    opt.classList.remove('selected');
+                });
                 this.classList.add('selected');
-                physicalFeelingInput.value = this.dataset.feeling;
+                physicalFeelingInput.value = this.getAttribute('data-feeling');
             });
         });
 
         // Handle mood selection
-        const moodOptions = document.querySelectorAll('.mood-option');
-        const moodInput = document.getElementById('mood');
+        var moodOptions = document.querySelectorAll('.mood-option');
+        var moodInput = document.getElementById('mood');
 
-        moodOptions.forEach(option => {
+        moodOptions.forEach(function(option) {
             option.addEventListener('click', function() {
-                moodOptions.forEach(opt => opt.classList.remove('selected'));
+                moodOptions.forEach(function(opt) {
+                    opt.classList.remove('selected');
+                });
                 this.classList.add('selected');
-                moodInput.value = this.dataset.mood;
+                moodInput.value = this.getAttribute('data-mood');
             });
         });
 
         // Handle form submission
         document.getElementById('foodLog').addEventListener('submit', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const formData = {
-        datetime: document.getElementById('datetime').value,
-        mealType: document.getElementById('mealType').value,
-        food: document.getElementById('food').value,
-        physicalFeeling: document.getElementById('physicalFeeling').value,
-        mood: document.getElementById('mood').value,
-        notes: document.getElementById('notes').value
-    };
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var formData = {
+                datetime: document.getElementById('datetime').value,
+                mealType: document.getElementById('mealType').value,
+                food: document.getElementById('food').value,
+                physicalFeeling: document.getElementById('physicalFeeling').value,
+                mood: document.getElementById('mood').value,
+                notes: document.getElementById('notes').value
+            };
 
-    const successMessage = document.getElementById('successMessage');
-    successMessage.classList.add('show');
-    
-    this.reset();
-    const physicalOptions = document.querySelectorAll('.physical-option');
-    const moodOptions = document.querySelectorAll('.mood-option');
-    physicalOptions.forEach(opt => opt.classList.remove('selected'));
-    moodOptions.forEach(opt => opt.classList.remove('selected'));
-    
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('datetime').value = now.toISOString().slice(0, 16);
-    
-    setTimeout(function() {
-        successMessage.classList.remove('show');
-    }, 3000);
+            var successMessage = document.getElementById('successMessage');
+            var errorMessage = document.getElementById('errorMessage');
+            
+            // Hide any previous messages
+            successMessage.classList.remove('show');
+            errorMessage.classList.remove('show');
 
-    // Send to n8n webhook
-    fetch('https://n8n.srv1107764.hstgr.cloud/webhook/food-log-submit', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(data) {
-        console.log('Success:', data);
-    })
-    .catch(function(error) {
-        console.error('Error:', error);
-    });
-    
-    return false;
-});
+            // Send to n8n webhook - REPLACE WITH YOUR ACTUAL WEBHOOK URL
+            fetch('https://n8n.srv1107764.hstgr.cloud/webhook/food-log-submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                console.log('Success:', data);
+                
+                // Show success message
+                successMessage.classList.add('show');
+                
+                // Reset form
+                document.getElementById('foodLog').reset();
+                physicalOptions.forEach(function(opt) {
+                    opt.classList.remove('selected');
+                });
+                moodOptions.forEach(function(opt) {
+                    opt.classList.remove('selected');
+                });
+                
+                // Reset datetime to current time
+                var now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('datetime').value = now.toISOString().slice(0, 16);
+                
+                // Hide success message after 3 seconds
+                setTimeout(function() {
+                    successMessage.classList.remove('show');
+                }, 3000);
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                
+                // Show error message
+                errorMessage.classList.add('show');
+                
+                // Hide error message after 5 seconds
+                setTimeout(function() {
+                    errorMessage.classList.remove('show');
+                }, 5000);
+            });
+            
+            return false;
+        });
+    </script>
+</body>
+</html>
