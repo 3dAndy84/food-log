@@ -1,1 +1,750 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health & Food Log v2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .optional {
+            color: #999;
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-item.checked {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            border-color: #667eea;
+        }
+
+        .radio-option.selected {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-water {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .btn-bathroom {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .success-message, .error-message {
+            display: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            min-width: 300px;
+            max-width: 90%;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+        }
+
+        .success-message.show, .error-message.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                bottom: -100px;
+                opacity: 0;
+            }
+            to {
+                bottom: 30px;
+                opacity: 1;
+            }
+        }
+
+        .export-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            margin-top: 10px;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .quick-log-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quick-log-card {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-log-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .quick-log-card h3 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .quick-log-card p {
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- MEAL LOG FORM -->
+    <div class="container">
+        <h1>🍽️ Meal & Health Log</h1>
+        <p class="subtitle">Track your meals and how you feel</p>
+
+        <form id="mealLog">
+            <div class="form-group">
+                <label for="datetime">Date & Time</label>
+                <input type="datetime-local" id="datetime" name="datetime" required>
+            </div>
+
+            <div class="form-group">
+                <label for="mealType">Meal Type</label>
+                <select id="mealType" name="mealType" required>
+                    <option value="">Select meal type...</option>
+                    <option value="Breakfast">🌅 Breakfast</option>
+                    <option value="Morning Snack">☕ Morning Snack</option>
+                    <option value="Lunch">🌞 Lunch</option>
+                    <option value="Afternoon Snack">🍎 Afternoon Snack</option>
+                    <option value="Dinner">🌙 Dinner</option>
+                    <option value="Evening Snack">🌃 Evening Snack</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="food">What did you eat?</label>
+                <textarea id="food" name="food" placeholder="Describe your meal..." required></textarea>
+            </div>
+
+            <div class="section-title">💭 How You Feel</div>
+
+            <div class="form-group">
+                <label>Physical Feelings <span class="optional">(select all that apply)</span></label>
+                <div class="checkbox-group" id="physicalFeelingsGroup">
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="energized"> Energized ⚡
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="satisfied"> Satisfied 😊
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="bloated"> Bloated 😣
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="tired"> Tired 😴
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="uncomfortable"> Uncomfortable 😖
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="nauseous"> Nauseous 🤢
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="headache"> Headache 🤕
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="dizzy"> Dizzy 😵
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="alert"> Alert 👁️
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Emotional Mood <span class="optional">(select all that apply)</span></label>
+                <div class="checkbox-group" id="moodGroup">
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="happy"> Happy 😄
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="calm"> Calm 😌
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="neutral"> Neutral 😐
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="anxious"> Anxious 😰
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="sad"> Sad 😔
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="stressed"> Stressed 😣
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="irritable"> Irritable 😠
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="content"> Content 😊
+                    </label>
+                </div>
+            </div>
+
+            <div class="section-title">⚠️ Pain Tracking</div>
+
+            <div class="form-group">
+                <label>Pain Level</label>
+                <div class="radio-group">
+                    <div class="radio-option" data-value="None">None</div>
+                    <div class="radio-option" data-value="Mild">Mild</div>
+                    <div class="radio-option" data-value="Moderate">Moderate</div>
+                    <div class="radio-option" data-value="Severe">Severe</div>
+                </div>
+                <input type="hidden" id="painLevel" name="painLevel" value="None">
+            </div>
+
+            <div class="form-group">
+                <label for="painLocation">Pain Location <span class="optional">(if any)</span></label>
+                <input type="text" id="painLocation" name="painLocation" placeholder="e.g., Lower abdomen, stomach">
+            </div>
+
+            <div class="form-group">
+                <label for="painDescription">Pain Description <span class="optional">(if any)</span></label>
+                <textarea id="painDescription" name="painDescription" placeholder="Describe the pain..."></textarea>
+            </div>
+
+            <div class="section-title">😴 Sleep & Fasting</div>
+
+            <div class="form-group">
+                <label for="sleepQuality">Sleep Quality <span class="optional">(previous night)</span></label>
+                <select id="sleepQuality" name="sleepQuality">
+                    <option value="">Select quality...</option>
+                    <option value="Excellent">⭐⭐⭐⭐⭐ Excellent</option>
+                    <option value="Good">⭐⭐⭐⭐ Good</option>
+                    <option value="Fair">⭐⭐⭐ Fair</option>
+                    <option value="Poor">⭐⭐ Poor</option>
+                    <option value="Very Poor">⭐ Very Poor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="lastMealTime">Last Meal Time <span class="optional">(for fasting calculation)</span></label>
+                <input type="datetime-local" id="lastMealTime" name="lastMealTime">
+                <p class="info-text">Enter when you last ate to calculate fasting hours</p>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes <span class="optional">(optional)</span></label>
+                <textarea id="notes" name="notes" placeholder="Any other observations..."></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">Log Meal</button>
+        </form>
+    </div>
+
+    <!-- QUICK LOG SECTION -->
+    <div class="container">
+        <h2>⚡ Quick Log</h2>
+        <p class="subtitle">Fast tracking for water and bathroom</p>
+
+        <div class="quick-log-grid">
+            <div class="quick-log-card" onclick="showWaterForm()">
+                <h3>💧</h3>
+                <p>Log Water</p>
+            </div>
+            <div class="quick-log-card" onclick="showBathroomForm()">
+                <h3>🚽</h3>
+                <p>Log Bathroom</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- WATER LOG MODAL -->
+    <div class="container" id="waterModal" style="display: none;">
+        <h2>💧 Water Intake</h2>
+        <form id="waterLog">
+            <div class="form-group">
+                <label for="waterDatetime">Date & Time</label>
+                <input type="datetime-local" id="waterDatetime" name="waterDatetime" required>
+            </div>
+
+            <div class="form-group">
+                <label for="waterAmount">Number of Cups</label>
+                <div class="radio-group" style="margin-bottom: 15px;">
+                    <div class="radio-option water-amount" data-amount="1">1 Cup</div>
+                    <div class="radio-option water-amount" data-amount="2">2 Cups</div>
+                    <div class="radio-option water-amount" data-amount="3">3 Cups</div>
+                </div>
+                <input type="number" id="waterAmount" name="waterAmount" placeholder="Or enter custom amount" min="0" step="0.5" required>
+                <p class="info-text">1 cup ≈ 240ml</p>
+            </div>
+
+            <button type="submit" class="btn-water">Log Water</button>
+            <button type="button" onclick="hideWaterForm()" style="background: #95a5a6; margin-top: 10px;">Cancel</button>
+        </form>
+    </div>
+
+    <!-- BATHROOM LOG MODAL -->
+    <div class="container" id="bathroomModal" style="display: none;">
+        <h2>🚽 Bathroom Log</h2>
+        <form id="bathroomLog">
+            <div class="form-group">
+                <label for="bathroomDatetime">Date & Time</label>
+                <input type="datetime-local" id="bathroomDatetime" name="bathroomDatetime" required>
+            </div>
+
+            <div class="form-group">
+                <label>Type <span class="optional">(select all that apply)</span></label>
+                <div class="checkbox-group" id="bathroomTypeGroup">
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="Stool"> 💩 Stool
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="Pee"> 💦 Pee
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bathroomNotes">Notes <span class="optional">(optional)</span></label>
+                <textarea id="bathroomNotes" name="bathroomNotes" placeholder="Any observations..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-bathroom">Log Bathroom</button>
+            <button type="button" onclick="hideBathroomForm()" style="background: #95a5a6; margin-top: 10px;">Cancel</button>
+        </form>
+    </div>
+
+    <!-- EXPORT SECTION -->
+    <div class="container">
+        <div class="export-section">
+            <h3>📊 Export Your Data</h3>
+            <p style="margin: 10px 0; color: #666;">Download all your logged entries</p>
+            <button class="export-btn" onclick="exportData()">Download as CSV</button>
+        </div>
+    </div>
+
+    <div class="success-message" id="successMessage"></div>
+    <div class="error-message" id="errorMessage"></div>
+
+    <script>
+        // Set current date and time for all forms
+        function setCurrentDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const formatted = now.toISOString().slice(0, 16);
+            document.getElementById('datetime').value = formatted;
+            document.getElementById('waterDatetime').value = formatted;
+            document.getElementById('bathroomDatetime').value = formatted;
+        }
+        setCurrentDateTime();
+
+        // Handle checkbox styling
+        document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    this.parentElement.classList.add('checked');
+                } else {
+                    this.parentElement.classList.remove('checked');
+                }
+            });
+        });
+
+        // Handle pain level selection
+        document.querySelectorAll('.radio-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Only affect radio options in the same group
+                const parent = this.parentElement;
+                parent.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Handle pain level
+                if (this.parentElement.previousElementSibling?.textContent.includes('Pain Level')) {
+                    document.getElementById('painLevel').value = this.getAttribute('data-value');
+                }
+                
+                // Handle water amount
+                if (this.classList.contains('water-amount')) {
+                    document.getElementById('waterAmount').value = this.getAttribute('data-amount');
+                }
+            });
+        });
+        document.querySelector('.radio-option[data-value="None"]').classList.add('selected');
+
+        // Show/hide forms
+        function showWaterForm() {
+            document.getElementById('waterModal').style.display = 'block';
+            document.getElementById('waterModal').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideWaterForm() {
+            document.getElementById('waterModal').style.display = 'none';
+        }
+
+        function showBathroomForm() {
+            document.getElementById('bathroomModal').style.display = 'block';
+            document.getElementById('bathroomModal').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideBathroomForm() {
+            document.getElementById('bathroomModal').style.display = 'none';
+        }
+
+        // Calculate fasting hours
+        function calculateFastingHours(lastMealTime, currentMealTime) {
+            if (!lastMealTime) return null;
+            const last = new Date(lastMealTime);
+            const current = new Date(currentMealTime);
+            const hours = (current - last) / (1000 * 60 * 60);
+            return Math.round(hours * 10) / 10;
+        }
+
+        // Show message
+        function showMessage(message, isError = false) {
+            const successEl = document.getElementById('successMessage');
+            const errorEl = document.getElementById('errorMessage');
+            
+            successEl.classList.remove('show');
+            errorEl.classList.remove('show');
+
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+                setTimeout(() => errorEl.classList.remove('show'), 5000);
+            } else {
+                successEl.textContent = message;
+                successEl.classList.add('show');
+                setTimeout(() => successEl.classList.remove('show'), 3000);
+            }
+        }
+
+        // Handle meal log submission
+        document.getElementById('mealLog').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            const physicalFeelings = Array.from(
+                document.querySelectorAll('#physicalFeelingsGroup input:checked')
+            ).map(cb => cb.value);
+
+            const moods = Array.from(
+                document.querySelectorAll('#moodGroup input:checked')
+            ).map(cb => cb.value);
+
+            const currentMealTime = document.getElementById('datetime').value;
+            const lastMealTime = document.getElementById('lastMealTime').value;
+            const fastingHours = calculateFastingHours(lastMealTime, currentMealTime);
+
+            const formData = {
+                type: 'meal',
+                datetime: currentMealTime,
+                mealType: document.getElementById('mealType').value,
+                food: document.getElementById('food').value,
+                physicalFeelings: physicalFeelings,
+                mood: moods,
+                painLevel: document.getElementById('painLevel').value,
+                painLocation: document.getElementById('painLocation').value || null,
+                painDescription: document.getElementById('painDescription').value || null,
+                sleepQuality: document.getElementById('sleepQuality').value || null,
+                lastMealTime: lastMealTime || null,
+                fastingHours: fastingHours,
+                notes: document.getElementById('notes').value || null
+            };
+
+            // REPLACE WITH YOUR N8N WEBHOOK URL
+            fetch('YOUR_N8N_WEBHOOK_URL_V2', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(data => {
+                showMessage('✓ Meal logged successfully!');
+                document.getElementById('mealLog').reset();
+                document.querySelectorAll('.checkbox-item').forEach(item => item.classList.remove('checked'));
+                document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+                document.querySelector('.radio-option[data-value="None"]').classList.add('selected');
+                setCurrentDateTime();
+            })
+            .catch(error => {
+                showMessage('✗ Failed to log meal. Please try again.', true);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Log Meal';
+            });
+
+            return false;
+        });
+
+        // Handle water log submission
+        document.getElementById('waterLog').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = {
+                type: 'water',
+                datetime: document.getElementById('waterDatetime').value,
+                waterAmount: document.getElementById('waterAmount').value
+            };
+
+            fetch('YOUR_N8N_WEBHOOK_URL_V2', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('✓ Water intake logged!');
+                document.getElementById('waterLog').reset();
+                hideWaterForm();
+                setCurrentDateTime();
+            })
+            .catch(error => {
+                showMessage('✗ Failed to log water.', true);
+            });
+
+            return false;
+        });
+
+        // Handle bathroom log submission
+        document.getElementById('bathroomLog').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const bathroomTypes = Array.from(
+                document.querySelectorAll('#bathroomTypeGroup input:checked')
+            ).map(cb => cb.value);
+
+            const formData = {
+                type: 'bathroom',
+                datetime: document.getElementById('bathroomDatetime').value,
+                bathroomTypes: bathroomTypes,
+                notes: document.getElementById('bathroomNotes').value || null
+            };
+
+            fetch('YOUR_N8N_WEBHOOK_URL_V2', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('✓ Bathroom visit logged!');
+                document.getElementById('bathroomLog').reset();
+                document.querySelectorAll('#bathroomTypeGroup .checkbox-item').forEach(item => item.classList.remove('checked'));
+                hideBathroomForm();
+                setCurrentDateTime();
+            })
+            .catch(error => {
+                showMessage('✗ Failed to log bathroom visit.', true);
+            });
+
+            return false;
+        });
+
+        // Export data
+        function exportData() {
+            alert('Export feature: Connect this to an n8n workflow that fetches your Airtable data and converts it to CSV. Would you like me to set that up?');
+        }
+    </script>
+</body>
+</html>
