@@ -649,7 +649,7 @@
             };
 
             // REPLACE WITH YOUR N8N WEBHOOK URL
-            fetch('YOUR_N8N_WEBHOOK_URL_V2', {
+            fetch('https://n8n.srv1107764.hstgr.cloud/webhook/health-log-submit-v2', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -687,7 +687,7 @@
                 waterAmount: document.getElementById('waterAmount').value
             };
 
-            fetch('YOUR_N8N_WEBHOOK_URL_V2', {
+            fetch('https://n8n.srv1107764.hstgr.cloud/webhook/health-log-submit-v2', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -721,7 +721,7 @@
                 notes: document.getElementById('bathroomNotes').value || null
             };
 
-            fetch('YOUR_N8N_WEBHOOK_URL_V2', {
+            fetch('https://n8n.srv1107764.hstgr.cloud/webhook/health-log-submit-v2', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
